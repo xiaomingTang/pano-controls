@@ -5,7 +5,7 @@ three.js `panorama / fov` controls as a typescript compatible npm module. [live 
 # Installation
 
 ```
-npm i -S panoControls
+npm i -S pano-controls
 ```
 
 # Usage
