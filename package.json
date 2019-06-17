@@ -1,0 +1,26 @@
+{
+  "name": "pano-controls",
+  "version": "1.0.0",
+  "description": "a panorama control for three.js",
+  "main": "index.js",
+  "dependencies": {
+    "three": "^0.105.2"
+  },
+  "devDependencies": {
+    "typescript": "^3.5.2"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "PanoControls",
+    "pano-control",
+    "fov-control",
+    "control",
+    "fov",
+    "panorama",
+    "three.js"
+  ],
+  "author": "1038761793@qq.com",
+  "license": "MIT"
+}
