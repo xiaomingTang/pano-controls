@@ -22,5 +22,6 @@
     "three.js"
   ],
   "author": "1038761793@qq.com",
-  "license": "MIT"
+  "license": "MIT",
+  "homepage": "https://github.com/xiaomingTang/pano-controls",
 }

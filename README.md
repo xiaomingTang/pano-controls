@@ -1,10 +1,12 @@
 # PanoControls
 
-three.js panorama/fov controls as a typescript compatible npm module.
+three.js `panorama / fov` controls as a typescript compatible npm module. [demo](https://xiaomingtang.github.io/pano-controls/examples/)
 
 # Installation
 
-`npm i -S panoControls`
+```
+npm i -S panoControls
+```
 
 # Usage
 
@@ -19,10 +21,10 @@ const camera = new THREE.PerspectiveCamera(/* ... */)
 
 const panoControl = new PanoControls(camera, container)
 
-panoControl.h       = whatEverYouWant
-panoControl.v       = whatEverYouWant
-panoControl.fov     = whatEverYouWant
-// set values and then updateCamera to update the camera
+panoControl.h   = whatEverYouWant
+panoControl.v   = whatEverYouWant
+panoControl.fov = whatEverYouWant
+// updateCamera after set h / v / fov
 panoControl.updateCamera()
 
 // default values:
@@ -37,6 +39,8 @@ function animate() {
   renderer.render(scene, camera)
   panoControl.update()
 }
+
+animate()
 
 ```
 

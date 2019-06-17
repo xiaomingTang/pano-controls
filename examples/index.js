@@ -16,22 +16,39 @@ window.addEventListener("resize", function(e) {
   camera.updateProjectionMatrix()
 })
 
+var colors = [
+  "#7fc4d8",
+  "#8997dd",
+  "#0f4170",
+  "#93b8d8",
+  "#6681f9",
+  "#a49fe0"
+]
+
 var geo = new THREE.CubeGeometry(1000, 1000, 1000)
 
-var geneMat = function geneMat(url) {
-  return new THREE.MeshBasicMaterial({
-    map: textureLoader.load(url),
+var geneMat = function geneMat(url, n) {
+  var mat = new THREE.MeshBasicMaterial({
+    color: colors[n],
     side: THREE.DoubleSide
   })
+
+  textureLoader.load(url, function(texture) {
+    mat.map = texture
+    mat.color = new THREE.Color()
+    mat.needsUpdate = true
+  })
+  
+  return mat
 }
 
 var panoBox = new THREE.Mesh(geo, [
-  geneMat("./images/pano_r.jpg"),
-  geneMat("./images/pano_l.jpg"),
-  geneMat("./images/pano_u.jpg"),
-  geneMat("./images/pano_d.jpg"),
-  geneMat("./images/pano_f.jpg"),
-  geneMat("./images/pano_b.jpg"),
+  geneMat("./images/pano_r.jpg", 0),
+  geneMat("./images/pano_l.jpg", 1),
+  geneMat("./images/pano_u.jpg", 2),
+  geneMat("./images/pano_d.jpg", 3),
+  geneMat("./images/pano_f.jpg", 4),
+  geneMat("./images/pano_b.jpg", 5),
 ])
 
 scene.add(panoBox)
