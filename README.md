@@ -10,6 +10,8 @@ npm i -S pano-controls
 
 # Usage
 
+### in js/ts
+
 ```javascript
 import * as THREE from "three"
 import PanoControls from "pano-controls"
@@ -24,7 +26,7 @@ const panoControl = new PanoControls(camera, container)
 panoControl.h   = whatEverYouWant
 panoControl.v   = whatEverYouWant
 panoControl.fov = whatEverYouWant
-// updateCamera after set h / v / fov
+// updateCamera after reset h / v / fov
 panoControl.updateCamera()
 
 function animate() {
@@ -33,6 +35,69 @@ function animate() {
 }
 
 animate()
+```
+### in react
+
+``` typescript
+import * as React from "react"
+import * as THREE from "three"
+import PanoControls from "pano-controls"
+
+const { useState, useRef, useEffect } = React
+
+// ...
+
+function WhatEverComponent() {
+  const containerRef = useRef()
+  const [panoControl, setPanoControl] = useState()
+  
+  // PerspectiveCamera is supported only
+  const camera = new THREE.PerspectiveCamera(/* ... */)
+
+  useEffect(() => {
+    if(containerRef) {
+      const pC = new PanoControls(camera, containerRef.current)
+
+      pC.h   = whatEverYouWant
+      pC.v   = whatEverYouWant
+      pC.fov = whatEverYouWant
+      // updateCamera after reset h / v / fov
+      pC.updateCamera()
+
+      setPanoControl(pC)
+
+      return () => {
+        pC.removeEvents()
+      }
+    }
+  }, [containerRef])
+
+  return <div ref={containerRef} style={{
+    width: "100%",
+    height: "100%",
+  }} />
+}
+
+// ...
+```
+
+### in script
+
+``` html
+<canvas id="canvas" style="width: 100%; height: 100%;" />
+
+<script src="path/to/three.min.js" />
+<script src="path/to/pano-controls.min.js" />
+
+<script>
+  // ...
+  
+  // umd
+  var PanoControls = window.PanoControls.default
+
+  // same as js/ts
+  var panoControl = new PanoControls(camera, container)
+</script>
 ```
 
 ### default values

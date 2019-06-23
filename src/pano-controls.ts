@@ -1,3 +1,7 @@
+/**
+ * @author xiaoming / 1038761793@qq.com
+ */
+
 import { EventDispatcher, Vector3, Spherical, Vector2, PerspectiveCamera } from "three"
 
 const THREE = { EventDispatcher, Vector3, Spherical, Vector2, PerspectiveCamera }
@@ -82,7 +86,8 @@ class PanoControls extends THREE.EventDispatcher {
     // }
 
     onResize: () => void = () => {
-        const { angle } = screen.msOrientation || screen.mozOrientation || (screen.orientation || {})
+        // @ts-ignore
+        const { angle } = screen.msOrientation || screen.mozOrientation || (screen.orientation || { angle: 0 })
         const isHorizonScreen = (angle > 45 && angle < 135) || (angle > 225 && angle < 315)
         const { width, height } = window.screen
         
@@ -355,25 +360,25 @@ class PanoControls extends THREE.EventDispatcher {
     }
 
     set fov(val: number) {
-        val = clamp(val, this.fovMin, this.fovMax)
+        val = clamp(val, this.minFov, this.maxFov)
         this.camera.fov = val
         this.dispatchEvent(this.SCALE_EVENT)
     }
     
-    get fovMin() {
+    get minFov() {
         return this._minFov
     }
 
-    set fovMin(val: number) {
+    set minFov(val: number) {
         val = clamp(val, EPS, 180 - EPS)
         this._minFov = val
     }
 
-    get fovMax() {
+    get maxFov() {
         return this._maxFov
     }
 
-    set fovMax(val: number) {
+    set maxFov(val: number) {
         val = clamp(val, EPS, 180 - EPS)
         this._maxFov = val
     }

@@ -77,8 +77,8 @@ declare class PanoControls extends THREE.EventDispatcher {
     h: number;
     v: number;
     fov: number;
-    fovMin: number;
-    fovMax: number;
+    minFov: number;
+    maxFov: number;
     minV: number;
     maxV: number;
     minH: number;

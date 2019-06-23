@@ -53,12 +53,12 @@ var panoBox = new THREE.Mesh(geo, [
 
 scene.add(panoBox)
 
+var PanoControls = window.PanoControls.default
+
 var panoControl = new PanoControls(camera, canvas)
 panoControl.h = -1
 panoControl.v = 113
 panoControl.fov = 96
-// default fovMin = 40
-// default fovMax = 140
 panoControl.updateCamera()
 
 Object.defineProperty(panoControl, "rotateSpeed", {
@@ -71,15 +71,20 @@ var panoControlOnChange = function panoControlOnChange() {
   panoControl.updateCamera()
 }
 
+gui.add(panoControl, "enabled").listen().onChange(panoControlOnChange)
+gui.add(panoControl, "enableRotate").listen().onChange(panoControlOnChange)
+gui.add(panoControl, "enableScale").listen().onChange(panoControlOnChange)
+gui.add(panoControl, "enableScaleDamping").listen().onChange(panoControlOnChange)
+gui.add(panoControl, "enableRotateDamping").listen().onChange(panoControlOnChange)
 gui.add(panoControl, "h").listen().onChange(panoControlOnChange)
 gui.add(panoControl, "v").listen().onChange(panoControlOnChange)
 gui.add(panoControl, "fov").listen().onChange(panoControlOnChange)
 gui.add(panoControl, "minH").listen().onChange(panoControlOnChange)
 gui.add(panoControl, "maxH").listen().onChange(panoControlOnChange)
-gui.add(panoControl, "minV").listen().onChange(panoControlOnChange)
+gui.add(panoControl, "minV").onChange(panoControlOnChange)
 gui.add(panoControl, "maxV").listen().onChange(panoControlOnChange)
-gui.add(panoControl, "fovMin").listen().onChange(panoControlOnChange)
-gui.add(panoControl, "fovMax").listen().onChange(panoControlOnChange)
+gui.add(panoControl, "minFov").listen().onChange(panoControlOnChange)
+gui.add(panoControl, "maxFov").listen().onChange(panoControlOnChange)
 
 var animate = function animate() {
   renderer.render(scene, camera)
