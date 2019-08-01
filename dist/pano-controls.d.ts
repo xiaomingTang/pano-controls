@@ -12,10 +12,13 @@ declare class PanoControls extends THREE.EventDispatcher {
     enableRotateDamping: boolean;
     enableScale: boolean;
     enableScaleDamping: boolean;
+    enableAutoRotate: boolean;
     rotateSpeed: number;
     scaleSpeed: number;
     rotateSmoothFactor: number;
     scaleSmoothFactor: number;
+    autoRotateSpeed: number;
+    autoRotateInterval: number;
     STATES: {
         NONE: number;
         ROTATE: number;
@@ -43,6 +46,7 @@ declare class PanoControls extends THREE.EventDispatcher {
     private _maxV;
     private _minH;
     private _maxH;
+    private _autoRotateStart;
     private target;
     private spherical;
     private touchScaleStart;

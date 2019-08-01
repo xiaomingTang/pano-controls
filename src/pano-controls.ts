@@ -20,11 +20,14 @@ class PanoControls extends THREE.EventDispatcher {
     public enableRotateDamping = true
     public enableScale = true
     public enableScaleDamping = true
+    public enableAutoRotate = true
 
     public rotateSpeed = 120
     public scaleSpeed = -100
     public rotateSmoothFactor = 0.9
-    public scaleSmoothFactor = 0.9    
+    public scaleSmoothFactor = 0.9
+    public autoRotateSpeed = -0.05
+    public autoRotateInterval = 5000
 
     public STATES = {
         NONE: 0,
@@ -64,6 +67,7 @@ class PanoControls extends THREE.EventDispatcher {
     private _maxV = 180 - EPS
     private _minH = -180
     private _maxH = 180
+    private _autoRotateStart = new Date().getTime()
 
     private target = new THREE.Vector3()
     private spherical = new THREE.Spherical()
@@ -196,6 +200,9 @@ class PanoControls extends THREE.EventDispatcher {
         this.update()
         this.rotateStart.set(clientX, clientY)
         this.dispatchEvent(this.INTERACT_EVENT)
+        if (this.enableAutoRotate) {
+          this._autoRotateStart = new Date().getTime()
+        }
     }
 
     onRotateEnd(e: MouseEvent | TouchEvent, isTouch = false) {
@@ -226,6 +233,9 @@ class PanoControls extends THREE.EventDispatcher {
         this.update()
         this.touchScaleStart = this.touchScaleEnd
         this.dispatchEvent(this.INTERACT_EVENT)
+        if (this.enableAutoRotate) {
+          this._autoRotateStart = new Date().getTime()
+        }
     }
 
     onTouchScaleEnd(e: TouchEvent) {
@@ -255,6 +265,9 @@ class PanoControls extends THREE.EventDispatcher {
         this.update()
         this.state &= ~this.STATES.SCALE
         this.dispatchEvent(this.INTERACT_EVENT)
+        if (this.enableAutoRotate) {
+          this._autoRotateStart = new Date().getTime()
+        }
     }
     
     addEvents() {
@@ -299,21 +312,32 @@ class PanoControls extends THREE.EventDispatcher {
     
     updateRotateDelta() {
         let needsUpdate = false
-        if(this.state & this.STATES.ROTATE) {
+
+        if (this.state & this.STATES.ROTATE) {
             this.rotateDelta.subVectors(this.rotateEnd, this.rotateStart).divide(this.domSizeVectors).multiplyScalar(this.rotateSpeed)
-            this.h += this.rotateDelta.x
-            this.v -= this.rotateDelta.y
             needsUpdate = true
         } else {
             if(this.enableRotateDamping && this.rotateDelta.lengthSq() > EPS) {
                 this.rotateDelta.multiplyScalar(this.rotateSmoothFactor)
-                this.h += this.rotateDelta.x
-                this.v -= this.rotateDelta.y
                 needsUpdate = true
             } else {
                 this.rotateDelta.set(0, 0)
             }
         }
+
+        const delta = new Date().getTime() - this._autoRotateStart
+        console.log(delta)
+        if (this.enableAutoRotate && (delta > this.autoRotateInterval)) {
+          this.state |= this.STATES.ROTATE
+          this.rotateDelta.x += this.autoRotateSpeed
+          needsUpdate = true
+        }
+        
+        if (needsUpdate) {
+          this.h += this.rotateDelta.x
+          this.v -= this.rotateDelta.y
+        }
+
         return needsUpdate
     }
 
