@@ -20,14 +20,13 @@ class PanoControls extends THREE.EventDispatcher {
     public enableRotateDamping = true
     public enableScale = true
     public enableScaleDamping = true
-    public enableAutoRotate = true
 
     public rotateSpeed = 120
     public scaleSpeed = -100
     public rotateSmoothFactor = 0.9
     public scaleSmoothFactor = 0.9
     public autoRotateSpeed = -0.05
-    public autoRotateInterval = 5000
+    public autoRotateInterval = 15000
 
     public STATES = {
         NONE: 0,
@@ -67,6 +66,7 @@ class PanoControls extends THREE.EventDispatcher {
     private _maxV = 180 - EPS
     private _minH = -180
     private _maxH = 180
+    private _enableAutoRotate = false
     private _autoRotateStart = new Date().getTime()
 
     private target = new THREE.Vector3()
@@ -326,7 +326,6 @@ class PanoControls extends THREE.EventDispatcher {
         }
 
         const delta = new Date().getTime() - this._autoRotateStart
-        console.log(delta)
         if (this.enableAutoRotate && (delta > this.autoRotateInterval)) {
           this.state |= this.STATES.ROTATE
           this.rotateDelta.x += this.autoRotateSpeed
@@ -359,6 +358,10 @@ class PanoControls extends THREE.EventDispatcher {
         return needsUpdate
     }
 
+    get enableAutoRotate() {
+      return this._enableAutoRotate
+    }
+
     get h() {
         return this.spherical.theta * 180 / PI
     }
@@ -369,6 +372,13 @@ class PanoControls extends THREE.EventDispatcher {
 
     get fov() {
         return this.camera.fov
+    }
+
+    set enableAutoRotate(val: boolean) {
+      this._enableAutoRotate = val
+      if (val) {
+        this._autoRotateStart = new Date().getTime()
+      }
     }
 
     set h(val: number) {

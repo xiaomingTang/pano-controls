@@ -115,13 +115,14 @@ panoControl.enableScale  = true
 panoControl.enableRotate = true
 panoControl.enableScaleDamping  = true
 panoControl.enableRotateDamping = true
-panoControl.enableAutoRotate = true
+panoControl.enableAutoRotate = false
 
 panoControl.scaleSpeed  = -100
 panoControl.rotateSpeed = 120
 panoControl.scaleSmoothFactor  = 0.9  // 0 - 1
 panoControl.rotateSmoothFactor = 0.9  // 0 - 1
 panoControl.autoRotateSpeed = -0.05
+panoControl.autoRotateInterval = 15000 // ms
 ```
 
 ### Events
