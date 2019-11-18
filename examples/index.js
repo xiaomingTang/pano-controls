@@ -53,7 +53,7 @@ var panoBox = new THREE.Mesh(geo, [
 
 scene.add(panoBox)
 
-var PanoControls = window.PanoControls.default
+var PanoControls = window.PanoControls
 
 var panoControl = new PanoControls(camera, canvas)
 panoControl.h = -1

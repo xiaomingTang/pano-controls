@@ -1,5 +1,5 @@
 const Constants = {
-  isProduction: process.env.NODE_ENV !== "development"
+  isProduction: process.env.NODE_ENV !== "development",
 }
 
 module.exports = Constants

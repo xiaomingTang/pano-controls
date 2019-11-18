@@ -5,7 +5,10 @@ three.js `panorama / fov` controls as a typescript compatible npm module. [live 
 # Installation
 
 ```
-npm i -S pano-controls
+# cmd
+yarn add pano-controls
+# or
+npm i pano-controls
 ```
 
 # Usage
@@ -87,13 +90,12 @@ function WhatEverComponent() {
 <canvas id="canvas" style="width: 100%; height: 100%;" />
 
 <script src="path/to/three.min.js" />
-<script src="path/to/pano-controls.min.js" />
+<script src="path/to/pano-controls/dist/index.min.js" />
 
 <script>
   // ...
   
-  // umd
-  var PanoControls = window.PanoControls.default
+  var PanoControls = window.PanoControls
 
   // same as js/ts
   var panoControl = new PanoControls(camera, container)

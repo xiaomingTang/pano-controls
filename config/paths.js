@@ -1,12 +1,13 @@
 const path = require("path")
 
-const root = path.resolve(__dirname, "../")
+const appRoot = path.resolve(__dirname, "../")
 
 const Paths = {
-  Root: root,
-  Src: path.join(root, "src"),
-  Dist: path.join(root, "dist"),
-  Public: path.join(root, "public"),
+  Root: appRoot,
+  Src: path.resolve(appRoot, "src"),
+  Public: path.resolve(appRoot, "public"),
+  Dist: path.resolve(appRoot, "dist"),
+  Config: path.resolve(appRoot, "config"),
 }
 
 module.exports = Paths
