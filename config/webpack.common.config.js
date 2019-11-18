@@ -22,7 +22,12 @@ const config = {
     libraryTarget: "umd",
   },
   externals: {
-    "three": "THREE"
+    "three": {
+      commonjs: "three",
+      commonjs2: "three",
+      amd: "three",
+      root: "THREE" // 指向全局变量
+    }
   },
   resolve: {
     extensions: [".ts", ".js", ".json"],
@@ -54,7 +59,7 @@ const config = {
           {
             loader: "ts-loader",
             options: {
-              transpileOnly: true,
+              // transpileOnly: true, // 要生成.d.ts文件就不能开启该选项
             },
           },
         ],
