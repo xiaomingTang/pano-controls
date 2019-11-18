@@ -4,7 +4,9 @@ const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin")
 const webpackOptimization = {
   minimizer: [
     new UglifyJsPlugin({
-      exclude: /\.min\.js$/, // 过滤掉以".min.js"结尾的文件，我们认为这个后缀本身就是已经压缩好的代码，没必要进行二次压缩
+      // 过滤掉以".min.js"结尾的文件，我们认为这个后缀本身就是已经压缩好的代码，没必要进行二次压缩
+      // 问题是, 他怎么把他自己给过滤掉了。。。
+      // exclude: /\.min\.js$/,
       cache: true,
       parallel: true, // 开启并行压缩，充分利用 cpu
       sourceMap: true, // 保留 sourceMap

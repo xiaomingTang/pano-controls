@@ -2,6 +2,7 @@
   "name": "pano-controls",
   "version": "2.0.1",
   "main": "./dist/index.min.js",
+  "types": "./dist/index.d.ts",
   "author": "xiaoming",
   "license": "MIT",
   "browserslist": [
@@ -16,9 +17,7 @@
     "lint": "eslint src --ext .js --ext .ts --ext .jsx --ext .tsx",
     "lint:fix": "eslint src --fix --ext .js --ext .ts --ext .jsx --ext .tsx"
   },
-  "dependencies": {
-    "three": "^0.105.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/autoprefixer": "^9.6.1",
     "@types/html-webpack-plugin": "^3.2.1",
