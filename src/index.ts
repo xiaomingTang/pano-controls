@@ -3,6 +3,10 @@
 
 import * as THREE from "three"
 
+// @ts-ignore
+// eslint-disable-next-line no-undef
+console.log(`PanoControls ${process.env.DEFINED_VERSION}`)
+
 const EPS = 0.000001
 
 const { PI } = Math

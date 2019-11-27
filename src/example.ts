@@ -1,48 +1,53 @@
-var gui = new dat.GUI()
+import * as dat from "dat.gui"
+import * as THREE from "three"
 
-var canvas = document.querySelector("#canvas")
+import PanoControls from "./index"
+
+const gui = new dat.GUI()
+
+const canvas = document.querySelector("#canvas") as HTMLCanvasElement
 
 canvas.width = canvas.clientWidth
 canvas.height = canvas.clientHeight
 
-var textureLoader = new THREE.TextureLoader()
-var renderer = new THREE.WebGLRenderer({ antialias: true, canvas: canvas })
-var scene = new THREE.Scene()
-var camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 1, 2000)
+const textureLoader = new THREE.TextureLoader()
+const renderer = new THREE.WebGLRenderer({ antialias: true, canvas })
+const scene = new THREE.Scene()
+const camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 1, 2000)
 renderer.setPixelRatio(window.devicePixelRatio)
 
-window.addEventListener("resize", function(e) {
+window.addEventListener("resize", () => {
   camera.aspect = canvas.clientWidth / canvas.clientHeight
   camera.updateProjectionMatrix()
 })
 
-var colors = [
+const colors = [
   "#7fc4d8",
   "#8997dd",
   "#0f4170",
   "#93b8d8",
   "#6681f9",
-  "#a49fe0"
+  "#a49fe0",
 ]
 
-var geo = new THREE.CubeGeometry(1000, 1000, 1000)
+const geo = new THREE.BoxGeometry(1000, 1000, 1000)
 
-var geneMat = function geneMat(url, n) {
-  var mat = new THREE.MeshBasicMaterial({
+const geneMat = function geneMat(url: string, n: number) {
+  const mat = new THREE.MeshBasicMaterial({
     color: colors[n],
-    side: THREE.DoubleSide
+    side: THREE.DoubleSide,
   })
 
-  textureLoader.load(url, function(texture) {
+  textureLoader.load(url, (texture) => {
     mat.map = texture
     mat.color = new THREE.Color()
     mat.needsUpdate = true
   })
-  
+
   return mat
 }
 
-var panoBox = new THREE.Mesh(geo, [
+const panoBox = new THREE.Mesh(geo, [
   geneMat("./images/pano_r.jpg", 0),
   geneMat("./images/pano_l.jpg", 1),
   geneMat("./images/pano_u.jpg", 2),
@@ -53,21 +58,19 @@ var panoBox = new THREE.Mesh(geo, [
 
 scene.add(panoBox)
 
-var PanoControls = window.PanoControls
-
-var panoControl = new PanoControls(camera, canvas)
+const panoControl = new PanoControls(camera, canvas)
 panoControl.h = -1
 panoControl.v = 113
 panoControl.fov = 96
 panoControl.updateCamera()
 
 Object.defineProperty(panoControl, "rotateSpeed", {
-  get: function() {
+  get() {
     return this.fov * 2
-  }
+  },
 })
 
-var panoControlOnChange = function panoControlOnChange() {
+const panoControlOnChange = function panoControlOnChange() {
   panoControl.updateCamera()
 }
 
@@ -88,7 +91,7 @@ gui.add(panoControl, "minFov").listen().onChange(panoControlOnChange)
 gui.add(panoControl, "maxFov").listen().onChange(panoControlOnChange)
 gui.add(panoControl, "autoRotateSpeed").listen().onChange(panoControlOnChange)
 
-var animate = function animate() {
+const animate = function animate() {
   renderer.render(scene, camera)
   panoControl.update()
   window.requestAnimationFrame(animate)
