@@ -59,9 +59,9 @@ const panoBox = new THREE.Mesh(geo, [
 scene.add(panoBox)
 
 const panoControl = new PanoControls(camera, canvas)
-panoControl.h = -1
-panoControl.v = 113
-panoControl.fov = 96
+panoControl.h = 1.5
+panoControl.v = 118
+panoControl.fov = 80
 panoControl.updateCamera()
 
 Object.defineProperty(panoControl, "rotateSpeed", {

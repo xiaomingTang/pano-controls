@@ -9,6 +9,15 @@ const EPS = 0.000001
 
 const { PI } = Math
 
+/**
+ * 可对小数进行“取模”的方法
+ * @returns 返回(a / b)的余数
+ */
+const decableMod = (a: number, b: number): number => {
+  const n = Math.floor(a / b)
+  return a - (n * b)
+}
+
 const clamp = (val: number, min: number, max: number): number => {
   if (val < min) {
     return min
@@ -21,16 +30,22 @@ const clamp = (val: number, min: number, max: number): number => {
 
 const loopedNumber = (val: number, min: number, max: number): number => {
   if (val < min) {
-    return val + max - min
+    // return val + max - min
+    // max - (min - val) % (max - min)
+    return max - decableMod(min - val, max - min)
   }
   if (val > max) {
-    return val + min - max
+    // return val + min - max
+    // min + (val - max) % (max - min)
+    return min + decableMod(val - max, max - min)
   }
   return val
 }
 
 class PanoControls extends THREE.EventDispatcher {
     public enabled = true
+
+    public enableLooped = true
 
     public enableRotate = true
 
@@ -40,43 +55,52 @@ class PanoControls extends THREE.EventDispatcher {
 
     public enableScaleDamping = true
 
+    /**
+     * 手指滑过一个[this.domSizeVectors.x]时，h(或v)的变化量
+     */
     public rotateSpeed = 120
 
+    /**
+     * 手指扩张一个[this.domSizeVectors.x]时，fov的变化量
+     */
     public scaleSpeed = -100
 
-    public rotateSmoothFactor = 0.9
-
-    public scaleSmoothFactor = 0.9
-
+    /**
+     * 每个代码执行周期内 自动旋转的角度
+     * 该值乘以fps(一般为60)即为每秒旋转的角度
+     */
     public autoRotateSpeed = -0.05
 
+    /**
+     * 启动自动旋转的时间间隔
+     */
     public autoRotateInterval = 15000
 
-    public STATES = {
-      NONE: 0,
-      ROTATE: 1,
-      SCALE: 1 << 1,
-    }
-
-    public state = this.STATES.NONE
-
-    // h/v发生设置行为(不论是否变动)时触发
-    public ROTATE_EVENT = {
+    /**
+     * h/v发生设置行为(不论是否变动)时触发
+     */
+    public readonly ROTATE_EVENT = {
       type: "rotate",
     }
 
-    // fov发生设置行为(不论是否变动)时触发
-    public SCALE_EVENT = {
+    /**
+     * fov发生设置行为(不论是否变动)时触发
+     */
+    public readonly SCALE_EVENT = {
       type: "scale",
     }
 
-    // updateCamera时触发
-    public CHANGE_EVENT = {
+    /**
+     * updateCamera时触发
+     */
+    public readonly CHANGE_EVENT = {
       type: "change",
     }
 
-    // 用户交互时触发
-    public INTERACT_EVENT = {
+    /**
+     * 用户交互时触发
+     */
+    public readonly INTERACT_EVENT = {
       type: "interact",
     }
 
@@ -84,7 +108,19 @@ class PanoControls extends THREE.EventDispatcher {
 
     public domElement: HTMLElement;
 
-    public domSizeVectors: THREE.Vector2;
+    /**
+     * 一个尺寸的量，触摸旋转时以此为基准
+     * 该值越大，则旋转同样角度，手指需要滑动的距离越大
+     */
+    public domSizeVectors = new THREE.Vector2()
+
+    private _STATES = {
+      NONE: 0,
+      ROTATE: 1,
+      SCALE: 1 << 1,
+    }
+
+    private _state = this._STATES.NONE
 
     private _minFov = 40
 
@@ -97,6 +133,10 @@ class PanoControls extends THREE.EventDispatcher {
     private _minH = -180
 
     private _maxH = 180
+
+    private _rotateSmoothFactor = 0.9
+
+    private _scaleSmoothFactor = 0.9
 
     private _enableAutoRotate = false
 
@@ -122,23 +162,17 @@ class PanoControls extends THREE.EventDispatcher {
       this.domElement.style.cursor = cursorStr
     }
 
-    // onResize: (e: Event) => void = () => {
-    //     const { width, height } = window.screen
-    //     this.domSizeVectors.set(height, height)
-    // }
-
+    /**
+     * resize的时候重置domSizeVectors
+     */
     onResize: () => void = () => {
-      // @ts-ignore
-      // eslint-disable-next-line no-restricted-globals
-      const { angle } = screen.msOrientation || screen.mozOrientation || (screen.orientation || { angle: 0 })
-      const isHorizonScreen = (angle > 45 && angle < 135) || (angle > 225 && angle < 315)
-      const { width, height } = window.screen
+      const { clientWidth, clientHeight } = this.domElement
 
-      if (isHorizonScreen) {
-        this.domSizeVectors.set(width, width)
-      } else {
-        this.domSizeVectors.set(height, height)
-      }
+      const greatVal = clientWidth > clientHeight
+        ? clientWidth
+        : clientHeight
+
+      this.domSizeVectors.set(greatVal, greatVal)
     }
 
     onTouchStart: (e: TouchEvent) => void = (e) => {
@@ -180,7 +214,7 @@ class PanoControls extends THREE.EventDispatcher {
         this.onRotateEnd(e, true)
         break
       case 2:
-        this.onTouchScaleEnd(e)
+        this.onTouchScaleEnd()
         break
       default:
         break
@@ -220,16 +254,17 @@ class PanoControls extends THREE.EventDispatcher {
       this.spherical.setFromVector3(v)
       this.target.copy(camera.position).add(v)
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { clientWidth, clientHeight } = domElement
-      this.domSizeVectors = new THREE.Vector2(clientHeight, clientHeight)
       this.onResize()
 
       this.addEvents()
     }
 
+    resetAutoRotateTimer() {
+      this._autoRotateStart = new Date().getTime()
+    }
+
     onRotateStart({ clientX, clientY }: MouseEvent | Touch, isTouch = false) {
-      this.state |= this.STATES.ROTATE
+      this._state |= this._STATES.ROTATE
       this.rotateStart.set(clientX, clientY)
       this.rotateEnd.set(clientX, clientY)
       if (isTouch) {
@@ -247,12 +282,12 @@ class PanoControls extends THREE.EventDispatcher {
       this.rotateStart.set(clientX, clientY)
       this.dispatchEvent(this.INTERACT_EVENT)
       if (this.enableAutoRotate) {
-        this._autoRotateStart = new Date().getTime()
+        this.resetAutoRotateTimer()
       }
     }
 
     onRotateEnd(e: MouseEvent | TouchEvent, isTouch = false) {
-      this.state &= ~this.STATES.ROTATE
+      this._state &= ~this._STATES.ROTATE
       if (isTouch) {
         document.removeEventListener("touchmove", this.onTouchMove)
         document.removeEventListener("touchend", this.onTouchEnd)
@@ -263,7 +298,7 @@ class PanoControls extends THREE.EventDispatcher {
     }
 
     onTouchScaleStart(touches: TouchList) {
-      this.state |= this.STATES.SCALE
+      this._state |= this._STATES.SCALE
       const { clientX: x1, clientY: y1 } = touches[0]
       const { clientX: x2, clientY: y2 } = touches[1]
       this.touchScaleStart = new THREE.Vector2(x1, y1).distanceTo(new THREE.Vector2(x2, y2)) / this.domSizeVectors.x
@@ -280,13 +315,12 @@ class PanoControls extends THREE.EventDispatcher {
       this.touchScaleStart = this.touchScaleEnd
       this.dispatchEvent(this.INTERACT_EVENT)
       if (this.enableAutoRotate) {
-        this._autoRotateStart = new Date().getTime()
+        this.resetAutoRotateTimer()
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    onTouchScaleEnd(e: TouchEvent) {
-      this.state &= ~this.STATES.SCALE
+    onTouchScaleEnd() {
+      this._state &= ~this._STATES.SCALE
       this.touchScaleStart = 0
       this.touchScaleEnd = 0
       document.removeEventListener("touchmove", this.onTouchMove)
@@ -305,16 +339,18 @@ class PanoControls extends THREE.EventDispatcher {
         // eslint-disable-next-line no-param-reassign
         deltaY *= 40
       }
-      this.state |= this.STATES.SCALE
+      this._state |= this._STATES.SCALE
       this.touchScaleStart = 0
-      // WARNING!!!
-      // 这里除以7000，是经验值，表示鼠标滚轮和触摸屏之间的协调参数
+      /**
+       * WARNING!!!
+       * 这里除以7000，是经验值，表示鼠标滚轮和触摸屏之间的协调参数
+       */
       this.touchScaleEnd = -deltaY / 7000
       this.update()
-      this.state &= ~this.STATES.SCALE
+      this._state &= ~this._STATES.SCALE
       this.dispatchEvent(this.INTERACT_EVENT)
       if (this.enableAutoRotate) {
-        this._autoRotateStart = new Date().getTime()
+        this.resetAutoRotateTimer()
       }
     }
 
@@ -361,8 +397,11 @@ class PanoControls extends THREE.EventDispatcher {
     updateRotateDelta() {
       let needsUpdate = false
 
-      if (this.state & this.STATES.ROTATE) {
-        this.rotateDelta.subVectors(this.rotateEnd, this.rotateStart).divide(this.domSizeVectors).multiplyScalar(this.rotateSpeed)
+      if (this._state & this._STATES.ROTATE) {
+        this.rotateDelta
+          .subVectors(this.rotateEnd, this.rotateStart)
+          .divide(this.domSizeVectors)
+          .multiplyScalar(this.rotateSpeed)
         needsUpdate = true
       } else if (this.enableRotateDamping && this.rotateDelta.lengthSq() > EPS) {
         this.rotateDelta.multiplyScalar(this.rotateSmoothFactor)
@@ -373,7 +412,7 @@ class PanoControls extends THREE.EventDispatcher {
 
       const delta = new Date().getTime() - this._autoRotateStart
       if (this.enableAutoRotate && (delta > this.autoRotateInterval)) {
-        this.state |= this.STATES.ROTATE
+        this._state |= this._STATES.ROTATE
         this.rotateDelta.x += this.autoRotateSpeed
         needsUpdate = true
       }
@@ -388,7 +427,7 @@ class PanoControls extends THREE.EventDispatcher {
 
     updateScaleDelta() {
       let needsUpdate = false
-      if (this.state & this.STATES.SCALE) {
+      if (this._state & this._STATES.SCALE) {
         this.scaleDelta = (this.touchScaleEnd - this.touchScaleStart) * this.scaleSpeed
         this.fov += this.scaleDelta
         needsUpdate = true
@@ -409,8 +448,36 @@ class PanoControls extends THREE.EventDispatcher {
     set enableAutoRotate(val: boolean) {
       this._enableAutoRotate = val
       if (val) {
-        this._autoRotateStart = new Date().getTime()
+        this.resetAutoRotateTimer()
       }
+    }
+
+    /**
+     * 旋转衰减因子，between 0 and 1
+     */
+    get rotateSmoothFactor() {
+      return this._rotateSmoothFactor
+    }
+
+    set rotateSmoothFactor(val: number) {
+      if (val <= 0 || val >= 1) {
+        console.error("PanoControls.rotateSmoothFactor must be a value between 0 and 1.")
+      }
+      this._rotateSmoothFactor = clamp(val, EPS, 1 - EPS)
+    }
+
+    /**
+     * 缩放衰减因子，between 0 and 1
+     */
+    set scaleSmoothFactor(val: number) {
+      if (val <= 0 || val >= 1) {
+        console.error("PanoControls.scaleSmoothFactor must be a value between 0 and 1.")
+      }
+      this._scaleSmoothFactor = clamp(val, EPS, 1 - EPS)
+    }
+
+    get scaleSmoothFactor() {
+      return this._scaleSmoothFactor
     }
 
     get h() {
@@ -418,9 +485,10 @@ class PanoControls extends THREE.EventDispatcher {
     }
 
     set h(val: number) {
-      // eslint-disable-next-line no-param-reassign
-      val = loopedNumber(val, this.minH, this.maxH)
-      this.spherical.theta = (val / 180) * PI
+      const realVal = this.enableLooped
+        ? loopedNumber(val, this.minH, this.maxH)
+        : clamp(val, this.minH, this.maxH)
+      this.spherical.theta = (realVal / 180) * PI
       this.dispatchEvent(this.ROTATE_EVENT)
     }
 
@@ -429,9 +497,8 @@ class PanoControls extends THREE.EventDispatcher {
     }
 
     set v(val: number) {
-      // eslint-disable-next-line no-param-reassign
-      val = clamp(val, this.minV, this.maxV)
-      this.spherical.phi = (val / 180) * PI
+      const realVal = clamp(val, this.minV, this.maxV)
+      this.spherical.phi = (realVal / 180) * PI
       this.dispatchEvent(this.ROTATE_EVENT)
     }
 
@@ -440,9 +507,7 @@ class PanoControls extends THREE.EventDispatcher {
     }
 
     set fov(val: number) {
-      // eslint-disable-next-line no-param-reassign
-      val = clamp(val, this.minFov, this.maxFov)
-      this.camera.fov = val
+      this.camera.fov = clamp(val, this.minFov, this.maxFov)
       this.dispatchEvent(this.SCALE_EVENT)
     }
 
@@ -451,9 +516,7 @@ class PanoControls extends THREE.EventDispatcher {
     }
 
     set minFov(val: number) {
-      // eslint-disable-next-line no-param-reassign
-      val = clamp(val, EPS, 180 - EPS)
-      this._minFov = val
+      this._minFov = clamp(val, EPS, this.maxFov)
     }
 
     get maxFov() {
@@ -461,9 +524,7 @@ class PanoControls extends THREE.EventDispatcher {
     }
 
     set maxFov(val: number) {
-      // eslint-disable-next-line no-param-reassign
-      val = clamp(val, EPS, 180 - EPS)
-      this._maxFov = val
+      this._maxFov = clamp(val, this.minFov, 180 - EPS)
     }
 
     get minV() {
@@ -471,9 +532,7 @@ class PanoControls extends THREE.EventDispatcher {
     }
 
     set minV(val: number) {
-      // eslint-disable-next-line no-param-reassign
-      val = clamp(val, EPS, 180 - EPS)
-      this._minV = val
+      this._minV = clamp(val, EPS, this.maxV)
     }
 
     get maxV() {
@@ -481,9 +540,7 @@ class PanoControls extends THREE.EventDispatcher {
     }
 
     set maxV(val: number) {
-      // eslint-disable-next-line no-param-reassign
-      val = clamp(val, EPS, 180 - EPS)
-      this._maxV = val
+      this._maxV = clamp(val, this.minV, 180 - EPS)
     }
 
     get minH() {
@@ -491,9 +548,7 @@ class PanoControls extends THREE.EventDispatcher {
     }
 
     set minH(val: number) {
-      // eslint-disable-next-line no-param-reassign
-      val = clamp(val, -180, 180)
-      this._minH = val
+      this._minH = clamp(val, -180, this.maxH)
     }
 
     get maxH() {
@@ -501,9 +556,7 @@ class PanoControls extends THREE.EventDispatcher {
     }
 
     set maxH(val: number) {
-      // eslint-disable-next-line no-param-reassign
-      val = clamp(val, -180, 180)
-      this._maxH = val
+      this._maxH = clamp(val, this.minH, 180)
     }
 }
 

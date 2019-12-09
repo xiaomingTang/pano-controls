@@ -15,11 +15,11 @@ npm i pano-controls
 
 ### in js/ts
 
-```javascript
+``` javascript
 import * as THREE from "three"
 import PanoControls from "pano-controls"
 
-let container // = ...
+const container = document.querySelector("#container")
 
 // PerspectiveCamera is supported only
 const camera = new THREE.PerspectiveCamera(/* ... */)
@@ -34,7 +34,9 @@ panoControl.updateCamera()
 
 function animate() {
   renderer.render(scene, camera)
+  // don't forget to run update()
   panoControl.update()
+  window.requestAnimationFrame(animate)
 }
 
 animate()
@@ -52,25 +54,23 @@ const { useState, useRef, useEffect } = React
 
 function WhatEverComponent() {
   const containerRef = useRef()
-  const [panoControl, setPanoControl] = useState()
   
   // PerspectiveCamera is supported only
   const camera = new THREE.PerspectiveCamera(/* ... */)
 
   useEffect(() => {
     if(containerRef) {
-      const pC = new PanoControls(camera, containerRef.current)
+      const control = new PanoControls(camera, containerRef.current)
 
-      pC.h   = whatEverYouWant
-      pC.v   = whatEverYouWant
-      pC.fov = whatEverYouWant
+      control.h   = whatEverYouWant
+      control.v   = whatEverYouWant
+      control.fov = whatEverYouWant
       // updateCamera after reset h / v / fov
-      pC.updateCamera()
-
-      setPanoControl(pC)
+      control.updateCamera()
 
       return () => {
-        pC.removeEvents()
+        // important!
+        control.removeEvents()
       }
     }
   }, [containerRef])
@@ -81,7 +81,7 @@ function WhatEverComponent() {
   }} />
 }
 
-// ...
+// don't forget to run update()
 ```
 
 ### in script
@@ -113,6 +113,7 @@ panoControl.minFov = 40
 panoControl.maxFov = 140
 
 panoControl.enabled = true
+panoControl.enableLooped = true
 panoControl.enableScale  = true
 panoControl.enableRotate = true
 panoControl.enableScaleDamping  = true
@@ -121,21 +122,21 @@ panoControl.enableAutoRotate = false
 
 panoControl.scaleSpeed  = -100
 panoControl.rotateSpeed = 120
-panoControl.scaleSmoothFactor  = 0.9  // 0 - 1
-panoControl.rotateSmoothFactor = 0.9  // 0 - 1
+panoControl.scaleSmoothFactor  = 0.9  // 0 ~ 1
+panoControl.rotateSmoothFactor = 0.9  // 0 ~ 1
 panoControl.autoRotateSpeed = -0.05
 panoControl.autoRotateInterval = 15000 // ms
 ```
 
 ### Events
 
-`change`: while `h`/`v`/`fov` is changed    
+`change`: while `h / v / fov` has changed    
 
-`rotate`: while `h`/`v` is changed    
+`rotate`: while `h / v` has changed    
 
-`scale`: while `fov` is changed    
+`scale`: while `fov` has changed    
 
-`interact`: while `h`/`v`/`fov` is changed caused by user action    
+`interact`: while `h / v / fov` has changed caused by user action    
 
 # License
 
