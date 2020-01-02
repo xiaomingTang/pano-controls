@@ -59,6 +59,7 @@ const panoBox = new THREE.Mesh(geo, [
 scene.add(panoBox)
 
 const panoControl = new PanoControls(camera, canvas)
+panoControl.enableAutoRotate = true
 panoControl.h = 1.5
 panoControl.v = 118
 panoControl.fov = 80
@@ -80,6 +81,10 @@ gui.add(panoControl, "enableScale").listen().onChange(panoControlOnChange)
 gui.add(panoControl, "enableScaleDamping").listen().onChange(panoControlOnChange)
 gui.add(panoControl, "enableRotateDamping").listen().onChange(panoControlOnChange)
 gui.add(panoControl, "enableAutoRotate").listen().onChange(panoControlOnChange)
+
+gui.add(panoControl, "enableLooped").listen().onChange(panoControlOnChange)
+gui.add(panoControl, "horizonReversed").listen().onChange(panoControlOnChange)
+
 gui.add(panoControl, "h").listen().onChange(panoControlOnChange)
 gui.add(panoControl, "v").listen().onChange(panoControlOnChange)
 gui.add(panoControl, "fov").listen().onChange(panoControlOnChange)

@@ -6497,6 +6497,13 @@ table@^5.2.3:
     slice-ansi "^2.1.0"
     string-width "^3.0.0"
 
+tang-pano@^1.4.1:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/tang-pano/-/tang-pano-1.6.0.tgz#75fac35da1d6417ae5862919361e6d040f786175"
+  integrity sha512-Vyw8ohf9HIus15LkjPe7ilgSugcGqpolzLWkUj5/o1seXHABN9jhQpf0GkavgpgDJbmGw0rSscX66xQGKS3ZJg==
+  dependencies:
+    wolfy87-eventemitter "^5.2.8"
+
 tapable@^0.1.8:
   version "0.1.10"
   resolved "https://registry.yarnpkg.com/tapable/-/tapable-0.1.10.tgz#29c35707c2b70e50d07482b5d202e8ed446dafd4"
@@ -7177,6 +7184,11 @@ wide-align@^1.1.0:
   integrity sha512-QGkOQc8XL6Bt5PwnsExKBPuMKBxnGxWWW3fU55Xt4feHozMUhdUMaBCk290qpm/wG5u/RSKzwdAC4i51YigihA==
   dependencies:
     string-width "^1.0.2 || 2"
+
+wolfy87-eventemitter@^5.2.8:
+  version "5.2.8"
+  resolved "https://registry.yarnpkg.com/wolfy87-eventemitter/-/wolfy87-eventemitter-5.2.8.tgz#fb7fff095cb972aa2a246b25e15b2764688c18a7"
+  integrity sha512-Z+wAU9SyuOZgFj22zBl8sg0auJOkrKBZl8TTlEM5dRDDs2zPtlm72vPJUIlf6tUJ4w2JLgrF7VznRnQHP+Rn/Q==
 
 word-wrap@~1.2.3:
   version "1.2.3"

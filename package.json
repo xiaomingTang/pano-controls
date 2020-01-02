@@ -16,7 +16,9 @@
     "lint": "eslint src --ext .js --ext .ts --ext .jsx --ext .tsx",
     "lint:fix": "eslint src --fix --ext .js --ext .ts --ext .jsx --ext .tsx"
   },
-  "dependencies": {},
+  "dependencies": {
+    "tang-pano": "^1.4.1"
+  },
   "devDependencies": {
     "@types/autoprefixer": "^9.6.1",
     "@types/dat.gui": "^0.7.5",
