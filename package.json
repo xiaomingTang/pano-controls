@@ -1,6 +1,6 @@
 {
   "name": "pano-controls",
-  "version": "2.1.1",
+  "version": "3.0.0",
   "main": "./dist/index.min.js",
   "types": "./dist/index.d.ts",
   "author": "xiaoming",
