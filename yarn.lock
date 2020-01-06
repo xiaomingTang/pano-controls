@@ -6497,10 +6497,10 @@ table@^5.2.3:
     slice-ansi "^2.1.0"
     string-width "^3.0.0"
 
-tang-pano@^1.4.1:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/tang-pano/-/tang-pano-1.6.0.tgz#75fac35da1d6417ae5862919361e6d040f786175"
-  integrity sha512-Vyw8ohf9HIus15LkjPe7ilgSugcGqpolzLWkUj5/o1seXHABN9jhQpf0GkavgpgDJbmGw0rSscX66xQGKS3ZJg==
+tang-pano@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/tang-pano/-/tang-pano-1.6.1.tgz#7b2299dac612937c5f2a9da6790c4811bc610c4c"
+  integrity sha512-Lv14U/4RL+MddB5Vj0I0uHvAAgZykn+yTSw5WbKwuWYBphS9+VSk0o2LBTMemNXddSQ2ccpG4moEQR4A47Nrog==
   dependencies:
     wolfy87-eventemitter "^5.2.8"
 
