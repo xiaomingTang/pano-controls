@@ -1,45 +1,10 @@
 const path = require("path")
 const webpack = require("webpack")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
-const MiniCssExtractPlugin = require("mini-css-extract-plugin")
-const autoprefixer = require("autoprefixer")
+const CopyPlugin = require("copy-webpack-plugin")
 
 const Paths = require("./Paths")
-const { isProduction } = require("./constants")
 const injectEnvPlugin = require("./env")
-
-const cssLoader = [
-  isProduction ? MiniCssExtractPlugin.loader : "style-loader",
-  "css-loader",
-].filter(Boolean)
-
-const postcssLoader = {
-  loader: "postcss-loader",
-  options: {
-    plugins: [
-      autoprefixer
-    ]
-  }
-}
-
-const sassLoader = {
-  loader: "sass-loader",
-  options: {
-    sourceMap: !isProduction
-  }
-}
-
-const cssModuleLoader = {
-  loader: "typings-for-css-modules-loader",
-  options: {
-    modules: true,
-    namedExport: true,
-    camelCase: true,
-    sass: true,
-    minimize: true,
-    localIdentName: "[local]_[hash:base64:5]"
-  }
-}
 
 module.exports = {
   mode: "development",
@@ -48,7 +13,7 @@ module.exports = {
     example: path.resolve(Paths.Src, "example.ts"),
   },
   output: {
-    path: Paths.Example,
+    path: Paths.DistExample,
     filename: "static/scripts/[name].[hash:6].js",
     chunkFilename: "static/scripts/chunk-[name].js"
   },
@@ -59,30 +24,41 @@ module.exports = {
     }
   },
   devServer: {
-    contentBase: Paths.Example,
+    contentBase: Paths.DistExample,
     // https: true,
     host: "0.0.0.0",
     port: 8080,
     useLocalIp: true,
-    // publicPath: "/example", // 此路径下的打包文件可在浏览器中访问
+    // publicPath: "/dist-example", // 此路径下的打包文件可在浏览器中访问
     hot: true,
     open: true,
-    openPage: "./example.html",
+    openPage: "./index.html",
     // overlay: true,
     // quiet: true,
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(Paths.Example, "example.html"),
-      filename: "example.html",
+      template: path.join(Paths.Public, "index.html"),
+      filename: "index.html",
       inject: "body",
       chunks: ["example"],
       // favicon: path.join(Paths.Example, "favicon.ico"),
       hash: true,
-      title: "pano-controls example page",
+      title: "PanoControls-example-page",
     }),
     new webpack.HotModuleReplacementPlugin(),
     injectEnvPlugin,
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.join(Paths.Root, "static"),
+          to: path.join(Paths.DistExample, "static"),
+        },
+      ],
+      options: {
+        concurrency: 100,
+      },
+    })
   ],
   module: {
     rules: [
@@ -111,63 +87,6 @@ module.exports = {
             },
           },
         ],
-      },
-      {
-        test: /\.css$/,
-        include: Paths.Src,
-        exclude: /\.min\.css$/,
-        use: cssLoader,
-      },
-      {
-        test: /\.s(a|c)ss$/,
-        include: Paths.Src,
-        exclude: /\.module\.s(a|c)ss$/,
-        use: [
-          ...cssLoader,
-          isProduction ? postcssLoader : null,
-          sassLoader,
-        ].filter(Boolean),
-      },
-      {
-        test: /\.module\.s(a|c)ss$/,
-        include: Paths.Src,
-        use: [
-          isProduction ? MiniCssExtractPlugin.loader : "style-loader",
-          cssModuleLoader,
-          postcssLoader,
-          sassLoader,
-        ]
-      },
-      {
-        test: /\.(png|jpg|jpeg|gif|ico)(\?.*)?$/i,
-        include: Paths.Src,
-        use: [{
-          loader: "url-loader",
-          options: {
-            limit: 8192,
-            name: "static/images/[name].[hash:6].[ext]"
-          }
-        }]
-      },
-      {
-        test: /\.(otf|eot|svg|ttf|woff)(\?.*)?$/i,
-        include: Paths.Src,
-        use: [{
-          loader: "url-loader",
-          options: {
-            limit: 8192,
-            name: "static/fonts/[name].[hash:6].[ext]"
-          }
-        }]
-      },
-      {
-        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/i,
-        include: Paths.Src,
-        loader: 'url-loader',
-        options: {
-          limit: 8192,
-          name: 'static/medias/[name].[hash:8].[ext]' // 文件名
-        }
       },
     ],
   },

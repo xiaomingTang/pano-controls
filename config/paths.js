@@ -8,7 +8,7 @@ const Paths = {
   Public: path.resolve(appRoot, "public"),
   Dist: path.resolve(appRoot, "dist"),
   Config: path.resolve(appRoot, "config"),
-  Example: path.resolve(appRoot, "example"),
+  DistExample: path.resolve(appRoot, "dist-example"),
 }
 
 module.exports = Paths

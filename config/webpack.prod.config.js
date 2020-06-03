@@ -1,46 +1,9 @@
 const path = require("path")
-const webpack = require("webpack")
-const MiniCssExtractPlugin = require("mini-css-extract-plugin")
-const autoprefixer = require("autoprefixer")
 const { CleanWebpackPlugin } = require("clean-webpack-plugin")
 
 const Paths = require("./Paths")
-const { isProduction } = require("./Constants")
 const webpackOptimization = require("./webpack-optimization")
 const injectEnvPlugin = require("./env")
-
-const cssLoader = [
-  isProduction ? MiniCssExtractPlugin.loader : "style-loader",
-  "css-loader",
-].filter(Boolean)
-
-const postcssLoader = {
-  loader: "postcss-loader",
-  options: {
-    plugins: [
-      autoprefixer
-    ]
-  }
-}
-
-const sassLoader = {
-  loader: "sass-loader",
-  options: {
-    sourceMap: !isProduction
-  }
-}
-
-const cssModuleLoader = {
-  loader: "typings-for-css-modules-loader",
-  options: {
-    modules: true,
-    namedExport: true,
-    camelCase: true,
-    sass: true,
-    minimize: true,
-    localIdentName: "[local]_[hash:base64:5]"
-  }
-}
 
 module.exports = {
   mode: "production",
@@ -50,10 +13,10 @@ module.exports = {
   },
   output: {
     path: Paths.Dist,
-    filename: isProduction ? "[name].min.js" : "[name].js",
+    filename: "[name].min.js",
     library: "PanoControls",
-    libraryExport: "default",
     libraryTarget: "umd",
+    libraryExport: "default",
   },
   externals: {
     "three": {
@@ -61,7 +24,13 @@ module.exports = {
       commonjs2: "three",
       amd: "three",
       root: "THREE" // 指向全局变量
-    }
+    },
+    "tang-pano": {
+      commonjs: "tang-pano",
+      commonjs2: "tang-pano",
+      amd: "tang-pano",
+      root: "TangPano" // 指向全局变量
+    },
   },
   resolve: {
     extensions: [".ts", ".js", ".json"],
@@ -97,74 +66,13 @@ module.exports = {
           },
         ],
       },
-      {
-        test: /\.css$/,
-        include: Paths.Src,
-        exclude: /\.min\.css$/,
-        use: cssLoader,
-      },
-      {
-        test: /\.s(a|c)ss$/,
-        include: Paths.Src,
-        exclude: /\.module\.s(a|c)ss$/,
-        use: [
-          ...cssLoader,
-          isProduction ? postcssLoader : null,
-          sassLoader,
-        ].filter(Boolean),
-      },
-      {
-        test: /\.module\.s(a|c)ss$/,
-        include: Paths.Src,
-        use: [
-          isProduction ? MiniCssExtractPlugin.loader : "style-loader",
-          cssModuleLoader,
-          postcssLoader,
-          sassLoader,
-        ]
-      },
-      {
-        test: /\.(png|jpg|jpeg|gif|ico)(\?.*)?$/i,
-        include: Paths.Src,
-        use: [{
-          loader: "url-loader",
-          options: {
-            limit: 8192,
-            name: "static/images/[name].[hash:6].[ext]"
-          }
-        }]
-      },
-      {
-        test: /\.(otf|eot|svg|ttf|woff)(\?.*)?$/i,
-        include: Paths.Src,
-        use: [{
-          loader: "url-loader",
-          options: {
-            limit: 8192,
-            name: "static/fonts/[name].[hash:6].[ext]"
-          }
-        }]
-      },
-      {
-        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/i,
-        include: Paths.Src,
-        loader: 'url-loader',
-        options: {
-          limit: 8192,
-          name: 'static/medias/[name].[hash:8].[ext]' // 文件名
-        }
-      },
     ],
   },
   plugins: [
-    new MiniCssExtractPlugin({
-      filename: "static/styles/[name].[hash:6].css",
-    }),
-    new webpack.WatchIgnorePlugin([/\.d\.ts$/]),
     new CleanWebpackPlugin({
       verbose: true,
       // dry: true,
-      cleanOnceBeforeBuildPatterns: ["index.html", "static/scripts/*", "static/styles/*"],
+      // cleanOnceBeforeBuildPatterns: ["index.html", "static/scripts/*", "static/styles/*"],
     }),
     injectEnvPlugin,
   ].filter(Boolean),

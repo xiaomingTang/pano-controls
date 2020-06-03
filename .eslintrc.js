@@ -29,6 +29,7 @@ module.exports = {
     }
   },
   rules: {
+    "import/extensions": "off",
     // window风格的换行(而非unix)
     "linebreak-style": ["error", "windows"],
     "quotes": ["error", "double"],

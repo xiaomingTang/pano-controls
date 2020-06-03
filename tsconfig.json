@@ -5,8 +5,7 @@
     "outDir": "./dist",
     "noImplicitAny": true,
     "module": "ESNext",
-    "moduleResolution": "node",
-    "checkJs": false,
+    "moduleResolution": "Node",
     "sourceMap": true,
     "declaration": true,
     "downlevelIteration": true,
@@ -18,9 +17,5 @@
       "@Src/*": [ "src/*" ]
     }
   },
-  "include": [ "src/**/*" ],
-  "exclude": [
-    "node_modules/**/*",
-    "**/*.d.ts"
-  ]
+  "include": [ "src/**/*" ]
 }

@@ -1,7 +1,9 @@
 /* eslint-disable no-bitwise */
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
 
-import * as THREE from "three"
+import {
+  PerspectiveCamera, Vector3, Spherical,
+} from "three"
 import { InteractiveElement } from "tang-pano"
 
 console.log(`PanoControls ${process.env.DEFINED_VERSION}`)
@@ -9,16 +11,16 @@ console.log(`PanoControls ${process.env.DEFINED_VERSION}`)
 const { PI } = Math
 
 class PanoControls extends InteractiveElement {
-  public camera: THREE.PerspectiveCamera;
+  public camera: PerspectiveCamera;
 
-  private target = new THREE.Vector3()
+  private target = new Vector3()
 
-  private spherical = new THREE.Spherical()
+  private spherical = new Spherical()
 
-  constructor(camera: THREE.PerspectiveCamera, domElement: HTMLElement) {
+  constructor(camera: PerspectiveCamera, domElement: HTMLElement) {
     super(domElement)
     this.camera = camera
-    const vec3 = camera.getWorldDirection(new THREE.Vector3())
+    const vec3 = camera.getWorldDirection(new Vector3())
     this.target.copy(camera.position).add(vec3)
     this.spherical.setFromVector3(vec3)
     this.h = (this.spherical.theta * 180) / PI
@@ -26,7 +28,7 @@ class PanoControls extends InteractiveElement {
     this.fov = this.camera.fov
   }
 
-  update() {
+  public update() {
     if (!this.enabled) {
       return
     }
@@ -38,7 +40,7 @@ class PanoControls extends InteractiveElement {
     }
   }
 
-  updateCamera() {
+  public updateCamera() {
     const {
       target, spherical, camera, h, v, fov,
     } = this

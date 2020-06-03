@@ -48,12 +48,12 @@ const geneMat = function geneMat(url: string, n: number) {
 }
 
 const panoBox = new THREE.Mesh(geo, [
-  geneMat("./images/pano_r.jpg", 0),
-  geneMat("./images/pano_l.jpg", 1),
-  geneMat("./images/pano_u.jpg", 2),
-  geneMat("./images/pano_d.jpg", 3),
-  geneMat("./images/pano_f.jpg", 4),
-  geneMat("./images/pano_b.jpg", 5),
+  geneMat("./static/images/pano_r.jpg", 0),
+  geneMat("./static/images/pano_l.jpg", 1),
+  geneMat("./static/images/pano_u.jpg", 2),
+  geneMat("./static/images/pano_d.jpg", 3),
+  geneMat("./static/images/pano_f.jpg", 4),
+  geneMat("./static/images/pano_b.jpg", 5),
 ])
 
 scene.add(panoBox)
@@ -67,6 +67,7 @@ panoControl.updateCamera()
 
 Object.defineProperty(panoControl, "rotateSpeed", {
   get() {
+    // 不同的 fov 给出不同的旋转速度, 用户体验更好
     return this.fov * 2
   },
 })
