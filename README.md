@@ -1,6 +1,19 @@
 # PanoControls
 
-three.js `panorama / fov` controls as a typescript compatible npm module. [live demo](https://xiaomingtang.github.io/pano-controls/examples/)
+three.js `panorama / fov` controls as a typescript compatible npm module.
+
+# 程序概览
+Entrys:    
+  - `development`: `src/example.ts`    
+  - `production`: `src/index.ts`    
+
+# 体验
+
+``` cmd
+git clone git@github.com:xiaomingTang/pano-controls.git
+yarn
+yarn start
+```
 
 # Installation
 
@@ -13,7 +26,7 @@ npm i pano-controls
 
 # Usage
 
-### in js/ts
+### js/ts
 
 ``` javascript
 import * as THREE from "three"
@@ -41,7 +54,7 @@ function animate() {
 
 animate()
 ```
-### in react
+### react
 
 ``` typescript
 import * as React from "react"
@@ -84,12 +97,14 @@ function WhatEverComponent() {
 // don't forget to run update()
 ```
 
-### in script
+### script
 
 ``` html
 <canvas id="canvas" style="width: 100%; height: 100%;" />
 
 <script src="path/to/three.min.js" />
+<!-- 本包有一个依赖包, 名为 "tang-pano", 需要手动下载 -->
+<script src="path/to/tang-pano/dist/index.min.js" />
 <script src="path/to/pano-controls/dist/index.min.js" />
 
 <script>
@@ -129,6 +144,8 @@ panoControl.autoRotateInterval = 15000 // ms
 ```
 
 ### Events
+
+`PanoControls` extends [https://github.com/Wolfy87/EventEmitter](https://github.com/Wolfy87/EventEmitter)
 
 `change`: while `h / v / fov` has changed    
 
