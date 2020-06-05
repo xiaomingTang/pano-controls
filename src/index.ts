@@ -52,7 +52,6 @@ class PanoControls extends InteractiveElement {
     target.setFromSpherical(spherical).add(camera.position)
     camera.lookAt(target)
     camera.updateProjectionMatrix()
-    this.emitEvent(this.CHANGE_EVENT, [])
   }
 }
 

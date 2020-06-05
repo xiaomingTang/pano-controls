@@ -60,6 +60,7 @@ scene.add(panoBox)
 
 const panoControl = new PanoControls(camera, canvas)
 panoControl.enableAutoRotate = true
+panoControl.autoRotateInterval = 3000
 panoControl.h = 1.5
 panoControl.v = 118
 panoControl.fov = 80
